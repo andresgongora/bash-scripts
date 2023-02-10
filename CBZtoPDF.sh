@@ -8,9 +8,20 @@ find . -name '*.cbz' | while read cbz; do
 	FILENAME="${BASENAME%.*}"
 	TMP_FOLDER="/tmp/$FILENAME/"
 	TMP_ZIP="/tmp/$FILENAME.zip"
-	CBZ="$PARENT/$FILENAME.cbz"
+	PDF="$PARENT/$FILENAME.pdf"
 
-	unzip "$cbz" -d "$TMP_FOLDER"
-	convert "${TMP_FOLDER}${FILENAME}/*" "./${FILENAME}.pdf" # Here I assume that everything inside the CBZ was an image and compatible with `convert`
-	rm -rf "$TMP_FOLDER"
+	#echo "DEBUG:"
+	#echo $PARENT
+	#echo $BASENAME
+	#echo $FILENAME
+	#echo $TMP_FOLDER
+	#echo $TMP_ZIP
+	#echo $PDF
+
+	cp "${cbz}" "${TMP_ZIP}"
+	unzip "${TMP_ZIP}" -d "${TMP_FOLDER}"
+	convert "${TMP_FOLDER}/*" "${PDF}" # Here I assume that everything inside the CBZ was an image and compatible with `convert`
+
+	rm -rf "${TMP_FOLDER}"
+	rm -rf "${TMP_ZIP}"
 done
