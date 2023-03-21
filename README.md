@@ -1,1 +1,4 @@
 # bash-scripts
+
+> local
+> readonly
