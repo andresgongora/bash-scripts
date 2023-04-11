@@ -43,8 +43,18 @@ housekeepGirDir() {
     local dir=$1
     if [ -d "${dir}" -a -d "${dir}/.git" ]; then
         echo "Git housekeeping: ${dir}"
-	    git -C "$dir" fetch
-        git -C "$dir" gc --auto --aggressive # Optimize, if needed
+
+        ## Fetch from remote, twice in case something goes wrong
+	    git -C "$dir" fetch; git -C "$dir" fetch
+
+        ## Delete local branches that have been merged
+        git -C "$dir" branch --merged | egrep -v "(^\*|HEAD|master|main|dev|release)" | xargs -r git branch -d
+
+        ## Prune origin: stop tracking branches that do not exist in origin
+        git -C "$dir" remote prune origin
+
+        ## Optimize, if needed
+        git -C "$dir" gc --auto --aggressive
     fi
 }
 
@@ -56,6 +66,6 @@ housekeepGirDir() {
 ##==============================================================================
 
 for dir in $(getGitDirs $1) ; do
-    housekeepGirDir $dir &
+    housekeepGirDir $dir
 done
 wait
