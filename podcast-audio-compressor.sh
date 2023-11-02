@@ -1,5 +1,17 @@
 #!/bin/bash
 
+function require(){
+    if ! command -v $1 &> /dev/null; then
+        echo "Missing dependency '$1'"
+        exit 1
+    fi
+}
+
+
+require 'trash'
+require 'lame'
+require 'ffmpeg'
+
 
 function compress(){
     local readonly INPUT="$1"
@@ -35,5 +47,3 @@ find "${DIR}/" -type f -print0 | while IFS= read -r -d '' file; do
             echo "\n\n\n"
 	fi
 done
-
-
