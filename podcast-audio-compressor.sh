@@ -39,7 +39,7 @@ find "${DIR}/" -type f -print0 | while IFS= read -r -d '' file; do
 
 	if [[ "$file_name" != *.PAC ]]; then
             echo "--------------------------------------------------"
-            echo "Dynamic-Range Compressing and normalizing ${INPUT}"
+            echo "Dynamic-Range Compressing and normalizing ${file_name}"
             echo "--------------------------------------------------"
             echo ""
 	        compress "${file}" # && trash "$file"
