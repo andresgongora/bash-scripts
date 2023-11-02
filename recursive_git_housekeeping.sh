@@ -42,13 +42,15 @@ getGitDirs() {
 housekeepGirDir() {
     local dir=$1
     if [ -d "${dir}" -a -d "${dir}/.git" ]; then
-        echo "Git housekeeping: ${dir}"
+        echo -e "\033[1mGit housekeeping: ${dir}\033[0m"
 
         ## Fetch from remote, twice in case something goes wrong
-	    git -C "$dir" fetch; git -C "$dir" fetch
+	    git -C "$dir" fetch || git -C "$dir" fetch
 
-        ## Delete local branches that have been merged
-        git -C "$dir" branch --merged | egrep -v "(^\*|HEAD|master|main|dev|release)" | xargs -r git branch -d
+        ## Delete local (non-important) branches that have been merged.
+        git -C "$dir" branch --merged \
+                | grep -E -v "(^\*|HEAD|master|main|dev|release)" \
+                | xargs -r git branch -d
 
         ## Prune origin: stop tracking branches that do not exist in origin
         git -C "$dir" remote prune origin
