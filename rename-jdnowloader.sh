@@ -1,5 +1,9 @@
 #!/bin/bash
 
+##==================================================================================================
+##	Main script
+##==================================================================================================
+
 readonly DIR=${1:-"."}
 readonly SED_VERSION=$(sed --version | head -n 1 | sed 's|[^0-9\.]||g')
 
@@ -7,6 +11,10 @@ find "${DIR}/" -type f -print0 | while IFS= read -r -d '' file; do
     #echo "$file"
 	file_name=$(basename -- "$file")
 	dir_name=$(dirname -- "$file")
+
+
+    if [[ $(basename "$file") == .*      ]]; then continue; fi ## Skip hidden files
+
 
 	## sed
     ## Not alphanumeric, punctuation, or spaces -> remove
