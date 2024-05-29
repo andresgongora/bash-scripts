@@ -20,6 +20,9 @@ search_and_move_to_trash() {
     find . -type f -name "*${file_extension}" -exec trash {} \;
     find . -type f -name "*${file_extension_lowercase}" -exec trash {} \;
     find . -type f -name "*${file_extension_uppercase}" -exec trash {} \;
+
+    find . -type d -empty -exec trash {} \;  # Remove empty directories
+    find . -type d -empty -exec trash {} \;  # Remove empty directories
 }
 
 

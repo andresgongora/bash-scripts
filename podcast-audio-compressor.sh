@@ -1,6 +1,14 @@
 #!/bin/bash
 
 ##==================================================================================================
+##	Imports
+##==================================================================================================
+
+readonly SCRIPT_PATH=$(dirname "$(readlink -f "$0")")
+source "${SCRIPT_PATH}/rename_downloads.sh"  # Import renameFile function
+
+
+##==================================================================================================
 ##	Requirements
 ##==================================================================================================
 
@@ -8,6 +16,7 @@ requireCommand() { command -v $1 >/dev/null || { echo "Aborting: '$1' not found"
 requireCommand trash
 requireCommand lame
 requireCommand ffmpeg
+requireCommand renameFile
 
 
 ##==================================================================================================
@@ -40,23 +49,17 @@ compress() {
 ##==================================================================================================
 
 readonly DIR=${1:-"."}
-
-## Check if there is a .rename.sh script in the current directory, if so, run it
-if [[ -f "${DIR}/.rename.sh" ]]; then
-    echo "Running .rename.sh"
-    command "${DIR}/.rename.sh" "${DIR}"
-fi
-
 find "${DIR}/" -type f -print0 | while IFS= read -r -d '' file; do
 
     if [[ $(basename "$file") == .*      ]]; then continue; fi ## Skip hidden files
     if [[ $(basename "$file") == *.PAC.* ]]; then continue; fi ## Skip already compressed files
+    if [[ $(basename "$file") == *.mp3   ]]; then continue; fi ## Skip mp3, likely already compressed
 
     echo "--------------------------------------------------------------------------------"
     echo "${file}"
     echo "--------------------------------------------------------------------------------"
     echo ""
-    compress "${file}" && trash "${file}"
+    renameFile "${file}" && compress "${file}" && trash "${file}"
     echo ""
     echo ""
     echo ""
