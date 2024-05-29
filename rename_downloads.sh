@@ -1,19 +1,16 @@
 #!/bin/bash
 
 ##==================================================================================================
-##	Main script
+##	Helper functions
 ##==================================================================================================
 
-readonly DIR=${1:-"."}
-readonly SED_VERSION=$(sed --version | head -n 1 | sed 's|[^0-9\.]||g')
-
-find "${DIR}/" -type f -print0 | while IFS= read -r -d '' file; do
-    #echo "$file"
-	file_name=$(basename -- "$file")
-	dir_name=$(dirname -- "$file")
+renameFile() {
+    local readonly file="$1"
+    local readonly file_name=$(basename -- "$file")
+	local readonly dir_name=$(dirname -- "$file")
 
 
-    if [[ $(basename "$file") == .*      ]]; then continue; fi ## Skip hidden files
+    if [[ "$file_name" == .* ]]; then continue; fi # Skip hidden files
 
 
 	## sed
@@ -21,6 +18,7 @@ find "${DIR}/" -type f -print0 | while IFS= read -r -d '' file; do
     ## ?; -> remove
     ## (bitrate_kbits) -> remove
     ## hls -> remove
+    ## multiple "." -> one "."
     ## _ -> space | multiple spaces -> one space | trailing spaces -> remove | leading spaces
 	new_file_name=$(echo "$file_name" | sed -r \
 			-e 's|[^[:alnum:][:punct:][:space:]]||g' \
@@ -30,7 +28,10 @@ find "${DIR}/" -type f -print0 | while IFS= read -r -d '' file; do
 			-e 's|_[0-9]\.|.|g' \
 			-e 's|[|¿\?\;\¡\!]||g' \
 			-e 's|\ ?\([0-9]\w*_\w*\)\.|\.|g' \
+            -e 's|\.+|\.|g' \
 			-e 's|_| |g; s|\ +|\ |g; s|\ \.|\.|g; s|^\ ||g;')
+
+    if [[ -z "$new_file_name" ]]; then continue; fi
 
 	if [[ "$new_file_name" != "$file_name" ]]; then
 		new_name="${dir_name}/${new_file_name}"
@@ -39,4 +40,14 @@ find "${DIR}/" -type f -print0 | while IFS= read -r -d '' file; do
 		    mv "$file" "$new_name"
         fi
 	fi
+}
+
+
+##==================================================================================================
+##	Main script
+##==================================================================================================
+
+readonly DIR=${1:-"."}
+find "${DIR}/" -type f -print0 | while IFS= read -r -d '' file; do
+    renameFile "$file"
 done
